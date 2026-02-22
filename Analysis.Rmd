@@ -1,0 +1,142 @@
+---
+title: "Analysis"
+author: "Shadrach"
+date: "2025-01-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+
+```{r}
+#load libraries
+
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(ggplot2)
+library(lubridate)
+library(purrr)
+library(DESeq2)
+library(ComplexHeatmap)
+library(RColorBrewer)
+library(BiocGenerics)
+library(EnhancedVolcano)
+library(BiocManager)
+```
+```{r}
+#load datasets
+
+Dataaset <- read.csv("fmc_Project1.csv")
+```
+
+
+```{r}
+str(Dataaset)
+
+##mutate all columns to factor
+Dataaset <- Dataaset %>% mutate_all(as.factor)
+
+#add 0 to all missing values
+#Dataaset[is.na(Dataaset)] <- "Yes"
+
+#call the levels
+levels(Dataaset$Section_1_Q1)
+
+
+
+
+
+```
+
+```{r}
+#summarize
+
+#sumaryy <- Dataaset %>% count(names(Dataaset))
+
+summary(Dataaset)
+```
+
+
+```{r}
+
+##count the number of instances of 1s and 0s in a column
+
+names(Dataaset)
+
+Frequency_Count <- do.call(rbind, lapply(names(Dataaset), function(col_name) {
+  if (is.factor(Dataaset[[col_name]])) {
+    counts <- table(Dataaset[[col_name]])
+    data.frame(
+      Questions = col_name,
+      Responses = names(counts),
+      Frequencyy = as.integer(counts)
+    )
+  } else {
+    NULL
+  }
+}))
+```
+
+
+```{r}
+#Filter each question group separately
+
+Group1 <- Frequency_Count[grep('S1', Frequency_Count$Questions),]
+
+ #Group1 %>% arrange(Frequencyy) 
+ #grppp <- Group1 %>% arrange(Questions, )
+```
+
+
+```{r}
+#make a plot for group 1
+
+Group1 %>% ggplot(aes(x = Questions, y = Frequencyy, fill = Responses)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Response to Questions",
+       y = "Frequency",
+       title = "Challenges encountered in Extemporaneous Compounding")
+```
+
+```{r}
+Group2 <- Frequency_Count[grep('S2', Frequency_Count$Questions),]
+
+```
+
+
+```{r}
+#make a plot for group 1
+
+Group2 %>% ggplot(aes(x = Questions, y = Frequencyy, fill = Responses)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Response to Questions",
+       y = "Frequency",
+       title = "Progress in Extemporaneous Drug Formulation")
+ 
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
